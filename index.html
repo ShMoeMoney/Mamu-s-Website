@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CraftONEZ – Hand Made Shop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── NAVIGATION ── -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#home" class="nav-logo">
+        <img src="images/LOGO.JPG" alt="CraftONEZ Logo" />
+      </a>
+      <ul class="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <button class="burger" id="burger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section id="home" class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <img src="images/LOGO.JPG" alt="CraftONEZ" class="hero-logo" />
+      <p class="hero-tagline">Every piece is made with love, just for you.</p>
+      <a href="#gallery" class="btn-primary">See Our Creations</a>
+    </div>
+    <div class="hero-scroll-hint">
+      <span>↓</span>
+    </div>
+  </section>
+
+  <!-- ── ABOUT STRIP ── -->
+  <section class="about-strip">
+    <div class="about-strip-inner">
+      <div class="strip-item">
+        <span class="strip-icon">✦</span>
+        <span>Handcrafted with Care</span>
+      </div>
+      <div class="strip-item">
+        <span class="strip-icon">✦</span>
+        <span>One-of-a-Kind Pieces</span>
+      </div>
+      <div class="strip-item">
+        <span class="strip-icon">✦</span>
+        <span>Custom Orders Welcome</span>
+      </div>
+      <div class="strip-item">
+        <span class="strip-icon">✦</span>
+        <span>Made with Love</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── GALLERY ── -->
+  <section id="gallery" class="gallery-section">
+    <div class="section-header">
+      <h2>Our Creations</h2>
+      <p>Scroll through our handmade collection — from playful gnomes to heartfelt keepsakes.</p>
+    </div>
+
+    <!-- Filter buttons -->
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="gnomes">Gnomes</button>
+      <button class="filter-btn" data-filter="pebble">Pebble Art</button>
+      <button class="filter-btn" data-filter="decor">Home Décor</button>
+    </div>
+
+    <div class="gallery-grid" id="galleryGrid">
+
+      <!-- Fabric Gnomes -->
+      <div class="gallery-item" data-cat="gnomes">
+        <img src="images/20260408_121038.jpeg" alt="Dragonfly Spring Gnome" loading="lazy" />
+        <div class="gallery-caption">Spring Dragonfly Gnome</div>
+      </div>
+
+      <div class="gallery-item" data-cat="gnomes">
+        <img src="images/20260427_162831.jpeg" alt="Floral Bear Gnome" loading="lazy" />
+        <div class="gallery-caption">Floral Bear Gnome</div>
+      </div>
+
+      <div class="gallery-item" data-cat="gnomes">
+        <img src="images/20260601_161854.jpeg" alt="NHL Original Six Gnome" loading="lazy" />
+        <div class="gallery-caption">NHL Original Six Gnome</div>
+      </div>
+
+      <div class="gallery-item" data-cat="gnomes">
+        <img src="images/1000040736.jpeg" alt="Toronto Blue Jays Gnome" loading="lazy" />
+        <div class="gallery-caption">Toronto Blue Jays Gnome</div>
+      </div>
+
+      <div class="gallery-item" data-cat="gnomes">
+        <img src="images/1000041166.jpeg" alt="Toronto Blue Jays Gnome" loading="lazy" />
+        <div class="gallery-caption">Blue Jays Gnome</div>
+      </div>
+
+      <div class="gallery-item" data-cat="gnomes">
+        <img src="images/1000040889.jpeg" alt="Toronto Maple Leafs Gnome" loading="lazy" />
+        <div class="gallery-caption">Toronto Maple Leafs Gnome</div>
+      </div>
+
+      <div class="gallery-item" data-cat="gnomes">
+        <img src="images/1000041183.jpeg" alt="Toronto Raptors Gnome" loading="lazy" />
+        <div class="gallery-caption">Toronto Raptors Gnome</div>
+      </div>
+
+      <div class="gallery-item" data-cat="gnomes">
+        <img src="images/20260504_175950.jpeg" alt="Buffalo Bills Gnome" loading="lazy" />
+        <div class="gallery-caption">Buffalo Bills Gnome</div>
+      </div>
+
+      <div class="gallery-item" data-cat="gnomes">
+        <img src="images/20260612_112722.jpeg" alt="Canada Maple Leaf Gnome" loading="lazy" />
+        <div class="gallery-caption">Canada Pride Gnome</div>
+      </div>
+
+      <div class="gallery-item" data-cat="gnomes">
+        <img src="images/20260612_112755.jpeg" alt="Canada Maple Leaf Gnome Black" loading="lazy" />
+        <div class="gallery-caption">Canada Pride Gnome – Classic</div>
+      </div>
+
+      <!-- Flower Pot Gnomes -->
+      <div class="gallery-item" data-cat="gnomes">
+        <img src="images/20260415_163657.jpeg" alt="Flower Pot Gnomes" loading="lazy" />
+        <div class="gallery-caption">Flower Pot Gnome Collection</div>
+      </div>
+
+      <!-- Pebble Art -->
+      <div class="gallery-item" data-cat="pebble">
+        <img src="images/20260504_175136.jpeg" alt="Love You Mom Pebble Art" loading="lazy" />
+        <div class="gallery-caption">Love You Mom – Pebble Art</div>
+      </div>
+
+      <div class="gallery-item" data-cat="pebble">
+        <img src="images/20260426_135210.jpeg" alt="Dad My Hero Pebble Art" loading="lazy" />
+        <div class="gallery-caption">Dad My Hero – Pebble Art</div>
+      </div>
+
+      <div class="gallery-item" data-cat="pebble">
+        <img src="images/20260504_175233.jpeg" alt="Love Couple Pebble Art" loading="lazy" />
+        <div class="gallery-caption">Love – Pebble Art</div>
+      </div>
+
+      <!-- Home Décor -->
+      <div class="gallery-item" data-cat="decor">
+        <img src="images/20260515_220829(1).jpeg" alt="Welcome to Our Home Sign" loading="lazy" />
+        <div class="gallery-caption">Welcome to Our Home Sign</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── LIGHTBOX ── -->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true">
+    <button class="lb-close" id="lbClose" aria-label="Close">&times;</button>
+    <button class="lb-prev" id="lbPrev" aria-label="Previous">&#8249;</button>
+    <button class="lb-next" id="lbNext" aria-label="Next">&#8250;</button>
+    <div class="lb-img-wrap">
+      <img id="lbImg" src="" alt="" />
+      <p id="lbCaption"></p>
+    </div>
+  </div>
+  <div id="lbBackdrop" class="lb-backdrop"></div>
+
+  <!-- ── CONTACT ── -->
+  <section id="contact" class="contact-section">
+    <div class="contact-inner contact-centered">
+      <h2>Get in Touch</h2>
+      <p class="contact-quote">We'd love to hear from you! Whether you want to place a custom order, ask about availability, or just say hello — we're here.</p>
+      <ul class="contact-details">
+        <li>
+          <span class="c-icon">📍</span>
+          <span>Local vendor – available at craft fairs &amp; markets</span>
+        </li>
+        <li>
+          <span class="c-icon">📦</span>
+          <span>Custom orders available on request</span>
+        </li>
+        <li>
+          <span class="c-icon">💌</span>
+          <a href="mailto:craftinezdecors@gmail.com">craftinezdecors@gmail.com</a>
+        </li>
+        <li>
+          <span class="c-icon">📘</span>
+          <a href="https://www.facebook.com/profile.php?id=61553183767850" target="_blank" rel="noopener">Find us on Facebook</a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="site-footer">
+    <img src="images/LOGO.JPG" alt="CraftONEZ" class="footer-logo" />
+    <p class="footer-tagline">Hand Made Shop · Made with Love</p>
+    <p class="footer-copy">&copy; 2026 CraftONEZ. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
