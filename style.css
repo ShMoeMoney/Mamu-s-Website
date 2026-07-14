@@ -322,6 +322,14 @@ body {
 /* hide filtered out items */
 .gallery-item.hidden { display: none; }
 
+.gallery-loading {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 2rem 0;
+}
+
 /* ── LIGHTBOX ── */
 .lightbox {
   display: none;

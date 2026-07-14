@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin – CraftONEZ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body class="admin-body">
+
+  <header class="admin-header">
+    <h1>CraftONEZ Admin</h1>
+    <button id="logoutBtn" class="btn-secondary hidden">Log Out</button>
+  </header>
+
+  <main class="admin-main">
+    <section id="loginSection" class="admin-card">
+      <h2>Log In</h2>
+      <form id="loginForm">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password" />
+        <button type="submit" class="btn-primary">Log In</button>
+        <p id="loginError" class="admin-error hidden"></p>
+      </form>
+    </section>
+
+    <section id="panelSection" class="hidden">
+      <div class="admin-card">
+        <h2>Add a Photo</h2>
+        <form id="uploadForm">
+          <label for="photoFile">Photo</label>
+          <input type="file" id="photoFile" accept="image/*" required />
+          <label for="photoCaption">Caption</label>
+          <input type="text" id="photoCaption" placeholder="e.g. Spring Dragonfly Gnome" />
+          <label for="photoCategory">Category</label>
+          <input type="text" id="photoCategory" list="categoryOptions" placeholder="e.g. gnomes" required />
+          <datalist id="categoryOptions"></datalist>
+          <button type="submit" class="btn-primary">Upload</button>
+          <p id="uploadStatus" class="admin-status hidden"></p>
+        </form>
+      </div>
+
+      <div class="admin-card">
+        <h2>Manage Photos</h2>
+        <p class="admin-hint">Edits and reordering save automatically.</p>
+        <div id="itemList" class="admin-item-list">
+          <p class="admin-hint">Loading…</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>
