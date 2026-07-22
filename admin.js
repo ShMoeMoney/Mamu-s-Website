@@ -8,7 +8,9 @@ const uploadStatus = document.getElementById('uploadStatus');
 const itemList = document.getElementById('itemList');
 const categoryOptions = document.getElementById('categoryOptions');
 
-const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
+const MAX_ORIGINAL_BYTES = 30 * 1024 * 1024; // sanity ceiling on the picked file, before compression
+const TARGET_UPLOAD_BYTES = 2.5 * 1024 * 1024; // compressed target so mobile photos clear the server's size limit
+const MAX_DIMENSION = 2000; // longest side, in pixels, after resizing
 
 let currentItems = [];
 
@@ -176,6 +178,40 @@ function fileToBase64(file) {
   });
 }
 
+// Phone camera photos (often 8-15MB) blow past the server's request size limit even
+// though the same limit rarely bites laptop photos, which tend to already be edited/
+// resized. Downscale + re-encode as JPEG in the browser so every upload is small,
+// regardless of source device. Falls back to the original file if this fails for any
+// reason (e.g. an older browser without createImageBitmap).
+async function prepareImageForUpload(file) {
+  if (typeof createImageBitmap !== 'function') return file;
+
+  let bitmap;
+  try {
+    bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+  } catch {
+    return file;
+  }
+
+  const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
+  const width = Math.round(bitmap.width * scale);
+  const height = Math.round(bitmap.height * scale);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  canvas.getContext('2d').drawImage(bitmap, 0, 0, width, height);
+  bitmap.close();
+
+  let quality = 0.85;
+  let blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+  while (blob && blob.size > TARGET_UPLOAD_BYTES && quality > 0.4) {
+    quality -= 0.15;
+    blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+  }
+  return blob || file;
+}
+
 uploadForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
@@ -183,25 +219,29 @@ uploadForm.addEventListener('submit', async (e) => {
   const file = fileInput.files[0];
   if (!file) return;
 
-  if (file.size > MAX_UPLOAD_BYTES) {
+  if (file.size > MAX_ORIGINAL_BYTES) {
     uploadStatus.classList.remove('hidden');
-    uploadStatus.textContent = 'That photo is over 8MB — please use a smaller file.';
+    uploadStatus.textContent = 'That photo is too large — please use a smaller file.';
     return;
   }
 
   uploadStatus.classList.remove('hidden');
-  uploadStatus.textContent = 'Uploading…';
+  uploadStatus.textContent = 'Preparing photo…';
 
   const caption = document.getElementById('photoCaption').value;
   const category = document.getElementById('photoCategory').value;
-  const dataBase64 = await fileToBase64(file);
+  const uploadBlob = await prepareImageForUpload(file);
+  const isJpeg = uploadBlob !== file;
+
+  uploadStatus.textContent = 'Uploading…';
+  const dataBase64 = await fileToBase64(uploadBlob);
 
   const res = await fetch('/api/admin/upload', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      filename: file.name,
-      contentType: file.type,
+      filename: isJpeg ? file.name.replace(/\.\w+$/, '.jpg') : file.name,
+      contentType: isJpeg ? 'image/jpeg' : file.type,
       dataBase64,
       caption,
       category,
