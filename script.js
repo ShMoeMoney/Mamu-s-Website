@@ -39,14 +39,9 @@ function renderFilterBar(items) {
     if (!seen.includes(item.category)) seen.push(item.category);
   });
   filterBar.innerHTML = '';
-  const allBtn = document.createElement('button');
-  allBtn.className = 'filter-btn active';
-  allBtn.dataset.filter = 'all';
-  allBtn.textContent = 'All';
-  filterBar.appendChild(allBtn);
-  seen.forEach((cat) => {
+  seen.forEach((cat, i) => {
     const btn = document.createElement('button');
-    btn.className = 'filter-btn';
+    btn.className = i === 0 ? 'filter-btn active' : 'filter-btn';
     btn.dataset.filter = cat;
     btn.textContent = categoryLabel(cat);
     filterBar.appendChild(btn);
@@ -91,7 +86,7 @@ function initGalleryInteractions() {
       btn.classList.add('active');
       const filter = btn.dataset.filter;
       galleryItems.forEach(item => {
-        if (filter === 'all' || item.dataset.cat === filter) {
+        if (item.dataset.cat === filter) {
           item.classList.remove('hidden');
         } else {
           item.classList.add('hidden');
