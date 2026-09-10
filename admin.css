@@ -55,7 +55,8 @@
 }
 .admin-card input[type="text"],
 .admin-card input[type="password"],
-.admin-card input[type="file"] {
+.admin-card input[type="file"],
+.admin-card select {
   padding: 0.65rem 0.85rem;
   border: 1.5px solid #ddd6cc;
   border-radius: 6px;
@@ -63,7 +64,8 @@
   font-size: 0.95rem;
   background: var(--cream);
 }
-.admin-card input:focus {
+.admin-card input:focus,
+.admin-card select:focus {
   outline: none;
   border-color: var(--gold);
 }

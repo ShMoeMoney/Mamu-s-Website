@@ -1,3 +1,58 @@
+// Seasonal theme — loaded from /api/theme, applied as a body class
+const THEME_FX = {
+  halloween: { particles: ['🦇', '🎃'], accents: ['🕸️', '🎃'] },
+  christmas: { particles: ['❄️'], accents: ['⛄'] },
+  thanksgiving: { particles: ['🍂', '🍁'], accents: ['🦃'] },
+};
+
+function initSeasonalDecor(theme) {
+  const config = THEME_FX[theme];
+  if (!config) return;
+
+  const fx = document.createElement('div');
+  fx.id = 'seasonalFx';
+  document.body.appendChild(fx);
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduceMotion) {
+    const count = window.innerWidth < 600 ? 10 : 18;
+    for (let i = 0; i < count; i++) {
+      const particle = document.createElement('span');
+      particle.className = 'fx-particle';
+      particle.textContent = config.particles[i % config.particles.length];
+      particle.style.left = `${Math.random() * 100}vw`;
+      particle.style.fontSize = `${0.9 + Math.random() * 1.2}rem`;
+      particle.style.animationDuration = `${8 + Math.random() * 10}s`;
+      particle.style.animationDelay = `${Math.random() * -18}s`;
+      particle.style.opacity = String(0.5 + Math.random() * 0.5);
+      fx.appendChild(particle);
+    }
+  }
+
+  config.accents.forEach((emoji, i) => {
+    const accent = document.createElement('span');
+    accent.className = 'fx-accent';
+    accent.textContent = emoji;
+    accent.style[i % 2 === 0 ? 'left' : 'right'] = '1rem';
+    accent.style.animationDelay = `${i * 0.4}s`;
+    fx.appendChild(accent);
+  });
+}
+
+async function applyTheme() {
+  try {
+    const res = await fetch('/api/theme');
+    const data = await res.json();
+    if (data.theme && data.theme !== 'default') {
+      document.body.classList.add(`theme-${data.theme}`);
+      initSeasonalDecor(data.theme);
+    }
+  } catch (err) {
+    // no theme set / request failed — fall back to the default look
+  }
+}
+applyTheme();
+
 // Navbar scroll effect
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
@@ -39,9 +94,9 @@ function renderFilterBar(items) {
     if (!seen.includes(item.category)) seen.push(item.category);
   });
   filterBar.innerHTML = '';
-  seen.forEach((cat, i) => {
+  seen.forEach((cat) => {
     const btn = document.createElement('button');
-    btn.className = i === 0 ? 'filter-btn active' : 'filter-btn';
+    btn.className = 'filter-btn';
     btn.dataset.filter = cat;
     btn.textContent = categoryLabel(cat);
     filterBar.appendChild(btn);
@@ -54,9 +109,15 @@ function renderGalleryGrid(items) {
     galleryGrid.innerHTML = '<p class="gallery-loading">No photos yet — check back soon!</p>';
     return;
   }
+  const hint = document.createElement('p');
+  hint.className = 'gallery-loading';
+  hint.id = 'galleryHint';
+  hint.textContent = 'Choose a category above to see our creations.';
+  galleryGrid.appendChild(hint);
+
   items.forEach((item) => {
     const div = document.createElement('div');
-    div.className = 'gallery-item';
+    div.className = 'gallery-item hidden';
     div.dataset.cat = item.category;
 
     const img = document.createElement('img');
@@ -85,6 +146,8 @@ function initGalleryInteractions() {
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const filter = btn.dataset.filter;
+      const hint = document.getElementById('galleryHint');
+      if (hint) hint.remove();
       galleryItems.forEach(item => {
         if (item.dataset.cat === filter) {
           item.classList.remove('hidden');

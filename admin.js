@@ -7,6 +7,8 @@ const uploadForm = document.getElementById('uploadForm');
 const uploadStatus = document.getElementById('uploadStatus');
 const itemList = document.getElementById('itemList');
 const categoryOptions = document.getElementById('categoryOptions');
+const themeSelect = document.getElementById('themeSelect');
+const themeStatus = document.getElementById('themeStatus');
 
 const MAX_ORIGINAL_BYTES = 30 * 1024 * 1024; // sanity ceiling on the picked file, before compression
 const TARGET_UPLOAD_BYTES = 2.5 * 1024 * 1024; // compressed target so mobile photos clear the server's size limit
@@ -19,7 +21,31 @@ function showPanel() {
   panelSection.classList.remove('hidden');
   logoutBtn.classList.remove('hidden');
   loadItems();
+  loadTheme();
 }
+
+async function loadTheme() {
+  const res = await fetch('/api/theme');
+  const data = await res.json();
+  themeSelect.value = data.theme || 'default';
+}
+
+themeSelect.addEventListener('change', async () => {
+  themeStatus.classList.remove('hidden');
+  themeStatus.textContent = 'Saving…';
+  const res = await fetch('/api/admin/theme', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ theme: themeSelect.value }),
+  });
+  if (res.ok) {
+    themeStatus.textContent = 'Saved!';
+    setTimeout(() => themeStatus.classList.add('hidden'), 2000);
+  } else {
+    const data = await res.json().catch(() => ({}));
+    themeStatus.textContent = data.error || 'Could not save theme';
+  }
+});
 
 function showLogin() {
   loginSection.classList.remove('hidden');

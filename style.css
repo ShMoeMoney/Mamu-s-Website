@@ -515,3 +515,76 @@ body {
   .lb-prev { left: 0.5rem; }
   .lb-next { right: 0.5rem; }
 }
+
+/* ── SEASONAL THEMES ── */
+body.theme-halloween {
+  --charcoal:  #1f1720;
+  --off-white: #f7ede0;
+  --cream:     #fbf3e6;
+  --gold:      #e2711d;
+  --gold-dark: #b85c14;
+  --rose:      #6b3fa0;
+}
+
+body.theme-christmas {
+  --charcoal:  #1e3d2f;
+  --off-white: #f7f3ee;
+  --cream:     #fdf7f0;
+  --gold:      #b3382c;
+  --gold-dark: #8f2a20;
+  --rose:      #2f6b45;
+}
+
+body.theme-thanksgiving {
+  --charcoal:  #3b2a1e;
+  --off-white: #f8f1e6;
+  --cream:     #fbf4e9;
+  --gold:      #c1652e;
+  --gold-dark: #96481e;
+  --rose:      #8a5a2b;
+}
+
+/* ── SEASONAL DECORATIONS ── */
+#seasonalFx {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.fx-particle {
+  position: absolute;
+  top: -10vh;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+  animation-name: fx-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.12));
+}
+
+@keyframes fx-fall {
+  from { transform: translateY(0) rotate(0deg); }
+  to   { transform: translateY(120vh) rotate(360deg); }
+}
+
+.fx-accent {
+  position: fixed;
+  bottom: 1rem;
+  font-size: 2.4rem;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.18));
+  animation: fx-bob 3s ease-in-out infinite;
+}
+
+@keyframes fx-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
+@media (max-width: 600px) {
+  .fx-accent { font-size: 1.8rem; }
+}
