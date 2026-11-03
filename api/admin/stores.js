@@ -1,9 +1,35 @@
-const { put } = require('@vercel/blob');
+const { put, del } = require('@vercel/blob');
 const { requireAuth } = require('../_lib/auth');
 const { readStores, writeStores } = require('../_lib/stores');
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8MB per image
 
+function slugify(input) {
+  return String(input || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'store';
+}
+
+async function uploadPhoto(idForPath, base64, filename, contentType) {
+  const buffer = Buffer.from(base64, 'base64');
+  if (buffer.length === 0 || buffer.length > MAX_BYTES) {
+    throw new Error('SIZE');
+  }
+  const ext = (String(filename || '').split('.').pop() || 'jpg').toLowerCase().slice(0, 5);
+  const pathname = `stores/${idForPath}-${Date.now()}.${ext}`;
+  const blob = await put(pathname, buffer, {
+    access: 'public',
+    contentType,
+    addRandomSuffix: true,
+  });
+  return blob.url;
+}
+
+// Single endpoint for all store admin actions (update / add / delete) — kept as one
+// serverless function rather than three, since Vercel's Hobby plan caps how many
+// functions a deployment can have.
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
@@ -11,13 +37,88 @@ module.exports = async function handler(req, res) {
   }
   if (!requireAuth(req, res)) return;
 
-  const { stores: incoming } = req.body || {};
-  if (!Array.isArray(incoming)) {
-    res.status(400).json({ error: 'Missing stores array' });
-    return;
-  }
+  const body = req.body || {};
+  const action = body.action || 'update';
 
   try {
+    if (action === 'delete') {
+      const { id } = body;
+      if (!id) {
+        res.status(400).json({ error: 'Missing id' });
+        return;
+      }
+      const current = await readStores();
+      const target = current.find((s) => s.id === id);
+      if (!target) {
+        res.status(404).json({ error: 'Not found' });
+        return;
+      }
+      // Only delete the blob if the photo actually lives in blob storage —
+      // seeded stores point at local /images files that aren't ours to delete.
+      if (target.photo && target.photo.includes('.public.blob.vercel-storage.com/')) {
+        try {
+          await del(target.photo);
+        } catch {
+          // non-fatal — proceed with removing the store entry regardless
+        }
+      }
+      const remaining = current.filter((s) => s.id !== id);
+      await writeStores(remaining);
+      res.status(200).json({ ok: true, stores: remaining });
+      return;
+    }
+
+    if (action === 'add') {
+      const { name, address, hours, phone, email, photoBase64, photoFilename, photoContentType } = body;
+      if (!String(name || '').trim()) {
+        res.status(400).json({ error: 'Store name is required' });
+        return;
+      }
+      if (!photoBase64 || !photoContentType || !photoContentType.startsWith('image/')) {
+        res.status(400).json({ error: 'A photo is required' });
+        return;
+      }
+
+      const current = await readStores();
+      const baseSlug = slugify(name);
+      let id = baseSlug;
+      let n = 2;
+      while (current.some((s) => s.id === id)) {
+        id = `${baseSlug}-${n}`;
+        n += 1;
+      }
+
+      let photo;
+      try {
+        photo = await uploadPhoto(id, photoBase64, photoFilename, photoContentType);
+      } catch {
+        res.status(400).json({ error: 'Photo must be under 8MB' });
+        return;
+      }
+
+      const newStore = {
+        id,
+        name: String(name).slice(0, 120),
+        photo,
+        address: String(address || '').slice(0, 300),
+        hours: String(hours || '').slice(0, 500),
+        phone: String(phone || '').slice(0, 40),
+        email: String(email || '').slice(0, 200),
+      };
+
+      const updated = [...current, newStore];
+      await writeStores(updated);
+      res.status(200).json({ ok: true, stores: updated });
+      return;
+    }
+
+    // action === 'update'
+    const incoming = body.stores;
+    if (!Array.isArray(incoming)) {
+      res.status(400).json({ error: 'Missing stores array' });
+      return;
+    }
+
     const current = await readStores();
     const byId = new Map(current.map((s) => [s.id, s]));
 
@@ -36,25 +137,12 @@ module.exports = async function handler(req, res) {
           res.status(400).json({ error: 'Store photo must be an image' });
           return;
         }
-        let buffer;
         try {
-          buffer = Buffer.from(edit.photoBase64, 'base64');
+          photo = await uploadPhoto(stored.id, edit.photoBase64, edit.photoFilename, edit.photoContentType);
         } catch {
-          res.status(400).json({ error: 'Invalid store photo data' });
-          return;
-        }
-        if (buffer.length === 0 || buffer.length > MAX_BYTES) {
           res.status(400).json({ error: 'Store photo must be under 8MB' });
           return;
         }
-        const ext = (String(edit.photoFilename || '').split('.').pop() || 'jpg').toLowerCase().slice(0, 5);
-        const pathname = `stores/${stored.id}-${Date.now()}.${ext}`;
-        const blob = await put(pathname, buffer, {
-          access: 'public',
-          contentType: edit.photoContentType,
-          addRandomSuffix: true,
-        });
-        photo = blob.url;
       }
 
       updated.push({
@@ -71,6 +159,6 @@ module.exports = async function handler(req, res) {
     await writeStores(updated);
     res.status(200).json({ ok: true, stores: updated });
   } catch (err) {
-    res.status(500).json({ error: 'Update failed' });
+    res.status(500).json({ error: 'Request failed' });
   }
 };

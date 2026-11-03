@@ -409,10 +409,10 @@ storesList.addEventListener('click', async (e) => {
   const name = card.querySelector('.store-name-input').value || 'this store';
   if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
 
-  const res = await fetch('/api/admin/stores-delete', {
+  const res = await fetch('/api/admin/stores', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id }),
+    body: JSON.stringify({ action: 'delete', id }),
   });
   if (res.ok) {
     const data = await res.json();
@@ -449,10 +449,11 @@ storeAddForm.addEventListener('submit', async (e) => {
   const isJpeg = uploadBlob !== file;
   const dataBase64 = await fileToBase64(uploadBlob);
 
-  const res = await fetch('/api/admin/stores-add', {
+  const res = await fetch('/api/admin/stores', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      action: 'add',
       name: document.getElementById('newStoreName').value,
       address: document.getElementById('newStoreAddress').value,
       hours: document.getElementById('newStoreHours').value,
