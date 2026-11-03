@@ -22,6 +22,7 @@ function showPanel() {
   logoutBtn.classList.remove('hidden');
   loadItems();
   loadTheme();
+  loadStores();
 }
 
 async function loadTheme() {
@@ -286,5 +287,125 @@ uploadForm.addEventListener('submit', async (e) => {
     uploadStatus.textContent = data.error || 'Upload failed';
   }
 });
+
+// ── STORE LOCATIONS ──
+const storesList = document.getElementById('storesList');
+let currentStores = [];
+
+function renderStores() {
+  if (currentStores.length === 0) {
+    storesList.innerHTML = '<p class="admin-hint">No stores configured.</p>';
+    return;
+  }
+  storesList.innerHTML = '';
+  currentStores.forEach((store) => {
+    const card = document.createElement('div');
+    card.className = 'store-edit-card';
+    card.dataset.id = store.id;
+    card.innerHTML = `
+      <img src="${escapeAttr(store.photo)}" alt="${escapeAttr(store.name)}" />
+      <label>Photo</label>
+      <input type="file" class="store-photo-input" accept="image/*" />
+      <label>Store Name</label>
+      <input type="text" class="store-name-input" value="${escapeAttr(store.name)}" />
+      <label>Address</label>
+      <input type="text" class="store-address-input" value="${escapeAttr(store.address)}" />
+      <label>Hours</label>
+      <textarea class="store-hours-input">${escapeAttr(store.hours)}</textarea>
+      <label>Phone</label>
+      <input type="text" class="store-phone-input" value="${escapeAttr(store.phone)}" />
+      <label>Email (optional)</label>
+      <input type="text" class="store-email-input" value="${escapeAttr(store.email)}" />
+      <p class="store-edit-status hidden"></p>
+    `;
+    storesList.appendChild(card);
+  });
+}
+
+async function persistStores(stores) {
+  const res = await fetch('/api/admin/stores', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ stores }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    alert(data.error || 'Could not save store changes — please refresh and try again.');
+    return null;
+  }
+  const data = await res.json();
+  return data.stores;
+}
+
+function collectStoresFromDOM() {
+  return [...storesList.querySelectorAll('.store-edit-card')].map((card) => ({
+    id: card.dataset.id,
+    name: card.querySelector('.store-name-input').value,
+    address: card.querySelector('.store-address-input').value,
+    hours: card.querySelector('.store-hours-input').value,
+    phone: card.querySelector('.store-phone-input').value,
+    email: card.querySelector('.store-email-input').value,
+  }));
+}
+
+async function saveStoreField(card) {
+  const edited = collectStoresFromDOM();
+  const saved = await persistStores(edited);
+  if (saved) {
+    currentStores = saved;
+    const status = card.querySelector('.store-edit-status');
+    status.textContent = 'Saved!';
+    status.classList.remove('hidden');
+    setTimeout(() => status.classList.add('hidden'), 2000);
+  }
+}
+
+storesList.addEventListener('focusout', (e) => {
+  if (!e.target.matches('.store-name-input, .store-address-input, .store-hours-input, .store-phone-input, .store-email-input')) return;
+  const card = e.target.closest('.store-edit-card');
+  saveStoreField(card);
+});
+
+storesList.addEventListener('change', async (e) => {
+  if (!e.target.classList.contains('store-photo-input')) return;
+  const card = e.target.closest('.store-edit-card');
+  const id = card.dataset.id;
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const status = card.querySelector('.store-edit-status');
+  status.classList.remove('hidden');
+  status.textContent = 'Uploading photo…';
+
+  const uploadBlob = await prepareImageForUpload(file);
+  const isJpeg = uploadBlob !== file;
+  const dataBase64 = await fileToBase64(uploadBlob);
+
+  const edited = collectStoresFromDOM().map((s) =>
+    s.id === id
+      ? {
+          ...s,
+          photoBase64: dataBase64,
+          photoFilename: isJpeg ? file.name.replace(/\.\w+$/, '.jpg') : file.name,
+          photoContentType: isJpeg ? 'image/jpeg' : file.type,
+        }
+      : s
+  );
+
+  const saved = await persistStores(edited);
+  if (saved) {
+    currentStores = saved;
+    renderStores();
+  } else {
+    status.classList.add('hidden');
+  }
+});
+
+async function loadStores() {
+  const res = await fetch('/api/stores');
+  const data = await res.json();
+  currentStores = data.stores || [];
+  renderStores();
+}
 
 checkSession();

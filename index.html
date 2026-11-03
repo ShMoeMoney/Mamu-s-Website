@@ -34,7 +34,10 @@
     <div class="hero-content">
       <img src="images/LOGO.JPG" alt="CraftONEZ" class="hero-logo" />
       <p class="hero-tagline">Every piece is made with love, just for you.</p>
-      <a href="#gallery" class="btn-primary">See Our Creations</a>
+      <div class="hero-actions">
+        <a href="#gallery" class="btn-primary">See Our Creations</a>
+        <button type="button" class="btn-outline" id="findStoresBtn">Find Us In Stores</button>
+      </div>
     </div>
     <div class="hero-scroll-hint">
       <span>↓</span>
@@ -89,6 +92,19 @@
     </div>
   </div>
   <div id="lbBackdrop" class="lb-backdrop"></div>
+
+  <!-- ── STORES MODAL ── -->
+  <div id="storesModal" class="stores-modal" role="dialog" aria-modal="true" aria-labelledby="storesModalTitle">
+    <button class="stores-modal-close" id="storesModalClose" aria-label="Close">&times;</button>
+    <div class="stores-modal-inner">
+      <h2 id="storesModalTitle">Find Us In Stores</h2>
+      <p class="stores-modal-sub">Our handmade decors and crafts are also sold in person at these locations.</p>
+      <div class="store-cards" id="storeCards">
+        <p class="gallery-loading">Loading store locations…</p>
+      </div>
+    </div>
+  </div>
+  <div id="storesBackdrop" class="stores-backdrop"></div>
 
   <!-- ── CONTACT ── -->
   <section id="contact" class="contact-section">

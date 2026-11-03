@@ -236,3 +236,80 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') lbPrev.click();
   if (e.key === 'ArrowRight') lbNext.click();
 });
+
+// ── STORES MODAL ──
+const findStoresBtn = document.getElementById('findStoresBtn');
+const storesModal = document.getElementById('storesModal');
+const storesBackdrop = document.getElementById('storesBackdrop');
+const storesModalClose = document.getElementById('storesModalClose');
+const storeCards = document.getElementById('storeCards');
+
+function escapeHtml(str) {
+  return String(str || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+function renderStoreCards(stores) {
+  if (!stores || stores.length === 0) {
+    storeCards.innerHTML = '<p class="gallery-loading">Store locations coming soon.</p>';
+    return;
+  }
+  storeCards.innerHTML = stores.map((store) => `
+    <div class="store-card">
+      <img src="${escapeHtml(store.photo)}" alt="${escapeHtml(store.name)}" loading="lazy" />
+      <div class="store-card-body">
+        <h3>${escapeHtml(store.name)}</h3>
+        <div class="store-detail">
+          <span class="c-icon">📍</span>
+          <span>${escapeHtml(store.address)}</span>
+        </div>
+        <div class="store-detail">
+          <span class="c-icon">🕒</span>
+          <span class="store-hours">${escapeHtml(store.hours)}</span>
+        </div>
+        <div class="store-detail">
+          <span class="c-icon">📞</span>
+          <a href="tel:${escapeHtml(store.phone.replace(/[^0-9+]/g, ''))}">${escapeHtml(store.phone)}</a>
+        </div>
+        ${store.email ? `
+        <div class="store-detail">
+          <span class="c-icon">💌</span>
+          <a href="mailto:${escapeHtml(store.email)}">${escapeHtml(store.email)}</a>
+        </div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+let storesLoaded = false;
+
+async function loadStores() {
+  if (storesLoaded) return;
+  try {
+    const res = await fetch('/api/stores');
+    const data = await res.json();
+    renderStoreCards(data.stores || []);
+    storesLoaded = true;
+  } catch (err) {
+    storeCards.innerHTML = '<p class="gallery-loading">Couldn\'t load store locations right now.</p>';
+  }
+}
+
+function openStoresModal() {
+  storesModal.classList.add('open');
+  storesBackdrop.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  loadStores();
+}
+
+function closeStoresModal() {
+  storesModal.classList.remove('open');
+  storesBackdrop.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+findStoresBtn.addEventListener('click', openStoresModal);
+storesModalClose.addEventListener('click', closeStoresModal);
+storesBackdrop.addEventListener('click', closeStoresModal);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && storesModal.classList.contains('open')) closeStoresModal();
+});
