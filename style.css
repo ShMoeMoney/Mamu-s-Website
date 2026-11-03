@@ -489,30 +489,32 @@ body {
   right: 1.2rem;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  background: var(--charcoal);
-  border: none;
+  gap: 0.5rem;
+  background: var(--gold);
+  border: 2px solid var(--gold-dark);
   color: #fff;
-  padding: 0.5rem 1.1rem 0.5rem 0.9rem;
+  padding: 0.6rem 1.4rem 0.6rem 1.1rem;
   border-radius: 30px;
   cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
   z-index: 2002;
 }
 .stores-modal-close:hover {
   background: var(--gold-dark);
   transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.3);
 }
-.stores-modal-close-x { font-size: 1.3rem; line-height: 1; }
+.stores-modal-close-x { font-size: 1.6rem; line-height: 1; font-weight: 700; }
 .stores-modal-close-label {
-  font-size: 0.82rem;
+  font-size: 0.92rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 @media (max-width: 500px) {
-  .stores-modal-close { top: 0.75rem; right: 0.75rem; padding: 0.45rem 0.9rem 0.45rem 0.7rem; }
+  .stores-modal-close { top: 0.75rem; right: 0.75rem; padding: 0.5rem 1.1rem 0.5rem 0.85rem; }
 }
 
 .store-cards {
