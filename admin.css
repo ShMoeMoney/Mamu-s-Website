@@ -56,6 +56,7 @@
 .admin-card input[type="text"],
 .admin-card input[type="password"],
 .admin-card input[type="file"],
+.admin-card textarea,
 .admin-card select {
   padding: 0.65rem 0.85rem;
   border: 1.5px solid #ddd6cc;
@@ -65,9 +66,19 @@
   background: var(--cream);
 }
 .admin-card input:focus,
+.admin-card textarea:focus,
 .admin-card select:focus {
   outline: none;
   border-color: var(--gold);
+}
+
+.admin-card textarea { resize: vertical; min-height: 80px; font-family: inherit; }
+
+.admin-subheading {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.25rem;
+  color: var(--charcoal);
+  margin: 1.75rem 0 0.75rem;
 }
 
 .btn-primary, .btn-secondary, .btn-danger, .btn-icon {
@@ -223,6 +234,10 @@
 .store-edit-status {
   font-size: 0.82rem;
   color: var(--gold-dark);
+}
+.store-delete-btn {
+  align-self: flex-start;
+  margin-top: 0.4rem;
 }
 
 .hidden { display: none !important; }

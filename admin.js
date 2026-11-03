@@ -316,6 +316,7 @@ function renderStores() {
       <input type="text" class="store-phone-input" value="${escapeAttr(store.phone)}" />
       <label>Email (optional)</label>
       <input type="text" class="store-email-input" value="${escapeAttr(store.email)}" />
+      <button type="button" class="btn-danger store-delete-btn">Delete Store</button>
       <p class="store-edit-status hidden"></p>
     `;
     storesList.appendChild(card);
@@ -401,11 +402,79 @@ storesList.addEventListener('change', async (e) => {
   }
 });
 
+storesList.addEventListener('click', async (e) => {
+  if (!e.target.classList.contains('store-delete-btn')) return;
+  const card = e.target.closest('.store-edit-card');
+  const id = card.dataset.id;
+  const name = card.querySelector('.store-name-input').value || 'this store';
+  if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+
+  const res = await fetch('/api/admin/stores-delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id }),
+  });
+  if (res.ok) {
+    const data = await res.json();
+    currentStores = data.stores;
+    renderStores();
+  } else {
+    const data = await res.json().catch(() => ({}));
+    alert(data.error || 'Delete failed — please try again.');
+  }
+});
+
 async function loadStores() {
   const res = await fetch('/api/stores');
   const data = await res.json();
   currentStores = data.stores || [];
   renderStores();
 }
+
+// ── ADD NEW STORE ──
+const storeAddForm = document.getElementById('storeAddForm');
+const storeAddStatus = document.getElementById('storeAddStatus');
+
+storeAddForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const fileInput = document.getElementById('newStorePhoto');
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  storeAddStatus.classList.remove('hidden');
+  storeAddStatus.textContent = 'Uploading…';
+
+  const uploadBlob = await prepareImageForUpload(file);
+  const isJpeg = uploadBlob !== file;
+  const dataBase64 = await fileToBase64(uploadBlob);
+
+  const res = await fetch('/api/admin/stores-add', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: document.getElementById('newStoreName').value,
+      address: document.getElementById('newStoreAddress').value,
+      hours: document.getElementById('newStoreHours').value,
+      phone: document.getElementById('newStorePhone').value,
+      email: document.getElementById('newStoreEmail').value,
+      photoBase64: dataBase64,
+      photoFilename: isJpeg ? file.name.replace(/\.\w+$/, '.jpg') : file.name,
+      photoContentType: isJpeg ? 'image/jpeg' : file.type,
+    }),
+  });
+
+  if (res.ok) {
+    const data = await res.json();
+    currentStores = data.stores;
+    renderStores();
+    storeAddForm.reset();
+    storeAddStatus.textContent = 'Store added!';
+    setTimeout(() => storeAddStatus.classList.add('hidden'), 2000);
+  } else {
+    const data = await res.json().catch(() => ({}));
+    storeAddStatus.textContent = data.error || 'Could not add store';
+  }
+});
 
 checkSession();

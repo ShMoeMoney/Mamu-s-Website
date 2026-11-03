@@ -47,10 +47,27 @@
 
       <div class="admin-card">
         <h2>Store Locations</h2>
-        <p class="admin-hint">Edit the two "Find Us In Stores" listings shown on the home page. Edits save when you leave a field; photo changes save immediately.</p>
+        <p class="admin-hint">Edit the "Find Us In Stores" listings shown on the home page. Edits save when you leave a field; photo changes save immediately.</p>
         <div id="storesList" class="admin-stores-list">
           <p class="admin-hint">Loading…</p>
         </div>
+        <h3 class="admin-subheading">Add a New Store</h3>
+        <form id="storeAddForm">
+          <label for="newStorePhoto">Photo</label>
+          <input type="file" id="newStorePhoto" accept="image/*" required />
+          <label for="newStoreName">Store Name</label>
+          <input type="text" id="newStoreName" required />
+          <label for="newStoreAddress">Address</label>
+          <input type="text" id="newStoreAddress" />
+          <label for="newStoreHours">Hours</label>
+          <textarea id="newStoreHours" rows="3" placeholder="e.g. Monday: Closed&#10;Tuesday: 11am – 5pm"></textarea>
+          <label for="newStorePhone">Phone</label>
+          <input type="text" id="newStorePhone" />
+          <label for="newStoreEmail">Email (optional)</label>
+          <input type="text" id="newStoreEmail" />
+          <button type="submit" class="btn-primary">Add Store</button>
+          <p id="storeAddStatus" class="admin-status hidden"></p>
+        </form>
       </div>
 
       <div class="admin-card">
